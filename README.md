@@ -17,3 +17,10 @@ Build produksi: `npm run build && npm start`
 - Kurs dan persentase pajak bisa diubah langsung di halaman (default 17494.13946 dan 2.66).
 - Untuk mengganti default, ubah nilai awal `useState` di `app/page.js`.
 - Logika hitung ada di `lib/summary.js`.
+
+## Jejak perhitungan bulanan
+
+Setelah menghitung, isi nama jejak (default: bulan dan tahun saat ini, bisa diganti) lalu tekan **Simpan**.
+Jejak tersimpan di `localStorage` browser (lihat `lib/storage.js`): total per kode, kurs, dan pajak.
+Nama yang sama akan menimpa jejak lama setelah konfirmasi. Di bagian "Jejak tersimpan" Anda bisa
+membuka rincian, memuat ulang ke halaman utama, atau menghapus.

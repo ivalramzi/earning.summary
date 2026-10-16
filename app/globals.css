@@ -29,3 +29,21 @@ tfoot td{font-weight:600;background:var(--soft);border-bottom:0}
 .note{color:var(--muted);font-size:13px;margin-top:14px}
 button{font:inherit;font-weight:500;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:8px 14px;cursor:pointer;margin-top:14px}
 button:hover{border-color:var(--accent)}
+.save{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-top:16px}
+.save label{display:flex;flex-direction:column;gap:4px;font-size:14px;color:var(--muted);flex:1 1 220px}
+.save input{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:9px 11px}
+.save input:focus{outline:2px solid var(--accent);outline-offset:2px}
+.save button{margin-top:0}
+button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+button.danger{color:var(--err)}
+.history{margin-top:40px}
+.history h2{font-size:22px;margin:0 0 12px}
+.saved{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.saved-item{background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.saved-head{display:grid;grid-template-columns:1fr auto;gap:2px 12px;width:100%;text-align:left;margin:0;border:0;border-radius:0;background:transparent;padding:14px 16px}
+.saved-name{font-weight:600}
+.saved-idr{font-weight:600;font-variant-numeric:tabular-nums}
+.saved-meta{grid-column:1/-1;color:var(--muted);font-size:13px}
+.saved-body{padding:0 16px 16px}
+.saved-body .scroll{border-radius:8px}
+.actions{display:flex;gap:10px}
