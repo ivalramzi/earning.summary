@@ -27,10 +27,11 @@ membuka rincian, memuat ulang ke halaman utama, atau menghapus.
 
 ## Font
 
-Semua teks memakai Mortane DEMO dengan bobot maksimal Medium (Thin sampai Medium) di `public/fonts/`. Heading dan label memakai 500,
-teks isi 400. Versi demo hanya berisi huruf A-Z dan a-z, jadi angka dan tanda baca memakai Open Sauce
-(family `Angka` di `globals.css`, dari CDN jsDelivr/Fontsource) dengan bobot yang mengikuti. Jika punya versi lengkap
-Mortane, cukup ganti file font. Versi demo biasanya tidak untuk pemakaian komersial.
+Teks memakai Mortane DEMO (`public/fonts/`, bobot Regular 400 dan Medium 500). Versi demo hanya berisi huruf A-Z dan a-z,
+jadi semua angka, "Rp", "$", dan tanda baca pada nilai ditampilkan utuh dengan satu font cadangan, Open Sauce
+(family `Angka` di `globals.css`, dari CDN jsDelivr/Fontsource). Untuk self-host Open Sauce, taruh file `.woff2`
+di `public/fonts/` dan ganti `url()` di `globals.css`. Jika punya Mortane versi lengkap, ganti file font dan ubah
+`--numfont` agar sama dengan `--body`. Versi demo biasanya tidak untuk pemakaian komersial.
 
 ## Fitur tambahan
 
@@ -38,3 +39,9 @@ Mortane, cukup ganti file font. Versi demo biasanya tidak untuk pemakaian komers
 - **Perbandingan antar jejak**: grafik batang bertumpuk per kode (muncul jika ada 2+ jejak).
 - **Cadangan**: unduh/impor semua jejak sebagai JSON.
 - **Kurs dan pajak terakhir** diingat di browser.
+
+## Tampilan
+
+- Desktop: dua kolom (unggah dan pengaturan di kiri, hasil di kanan). Mobile: satu kolom, tabel menjadi kartu.
+- Mode terang dan gelap mengikuti pengaturan perangkat.
+- Kurs dan pajak menerima koma atau titik sebagai desimal (`17494,13946` atau `17494.13946`).
