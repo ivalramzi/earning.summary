@@ -6,7 +6,7 @@ import {
 } from "../lib/summary";
 import {
   loadRecords, saveRecord, deleteRecord, recordExists,
-  loadSettings, saveSettings, exportRecords, importRecords,
+  loadSettings, saveSettings, exportRecords, importRecords, loadBackupAt, saveBackupAt,
 } from "../lib/storage";
 
 const BULAN = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
@@ -17,6 +17,9 @@ const defaultName = () => {
 const toInput = (n) => String(n).replace(".", ",");
 const PAL = ["#bcb3f3", "#d4f46a", "#f4a597", "#8fd9c9", "#8fb4f5", "#f0cf9a"];
 const colorOf = (i) => PAL[i % PAL.length];
+// Warna + pola (pt-0..pt-5, lihat globals.css) agar kelompok tetap terbedakan tanpa mengandalkan warna.
+const pat = (i) => (i + Math.floor(i / PAL.length)) % PAL.length;
+const sw = (i, extra) => ({ className: "pt-" + pat(i), style: { backgroundColor: colorOf(i), ...extra } });
 const jt = (n) => (n / 1e6).toFixed(1).replace(".", ",") + " jt";
 
 // Angka dan simbol selalu satu font (Mortane DEMO tidak punya angka).
@@ -52,27 +55,39 @@ function ShareBar({ rows, total }) {
     <>
       <div className="share-track" role="img" aria-label={"Komposisi: " + rows.map((r) => `${r.key} ${pct(r)}%`).join(", ")}>
         {rows.map((r, i) => (
-          <i key={r.key} style={{ width: `${(r.net / total) * 100}%`, background: colorOf(i) }} />
+          <i key={r.key} {...sw(i, { width: `${(r.net / total) * 100}%` })} />
         ))}
       </div>
       <ul className="share-legend">
         {rows.map((r, i) => (
-          <li key={r.key}><i style={{ background: colorOf(i) }} />{r.key} <N>{pct(r)}%</N></li>
+          <li key={r.key}><i {...sw(i)} />{r.key} <N>{pct(r)}%</N></li>
         ))}
       </ul>
     </>
   );
 }
 
+const COLS = [
+  { label: "Kelompok" },
+  { label: "Setelah pajak (Rp)", key: true, get: (r) => fmtIdr(r.netIdr) },
+  { label: "Setelah pajak", get: (r) => fmtUsd(r.net) },
+  { label: "Sebelum pajak", get: (r) => fmtUsd(r.gross) },
+  { label: "Pajak", get: (r) => fmtUsd(r.tax) },
+  { label: "Jumlah item", get: (r) => r.count },
+];
+
 function SummaryTable({ summary }) {
   const { rows, total } = summary;
+  const cells = (r) => COLS.slice(1).map((c) => (
+    <td role="cell" key={c.label} data-label={c.label} className={c.key ? "key" : undefined}><N>{c.get(r)}</N></td>
+  ));
   return (
     <div className="scroll">
       <table role="table">
         <thead role="rowgroup">
           <tr role="row">
-            {["Kelompok", "Jumlah item", "Sebelum pajak", "Pajak", "Setelah pajak", "Setelah pajak (Rp)"].map((h) => (
-              <th key={h} role="columnheader" scope="col">{h}</th>
+            {COLS.map((c) => (
+              <th key={c.label} role="columnheader" scope="col" className={c.key ? "key" : undefined}>{c.label}</th>
             ))}
           </tr>
         </thead>
@@ -82,22 +97,14 @@ function SummaryTable({ summary }) {
               <td role="cell" data-label="Kelompok">
                 {r.key === "Lainnya" ? "Lainnya" : <><span className="pfx">Kode </span><N>{r.key}</N></>}
               </td>
-              <td role="cell" data-label="Jumlah item"><N>{r.count}</N></td>
-              <td role="cell" data-label="Sebelum pajak"><N>{fmtUsd(r.gross)}</N></td>
-              <td role="cell" data-label="Pajak"><N>{fmtUsd(r.tax)}</N></td>
-              <td role="cell" data-label="Setelah pajak"><N>{fmtUsd(r.net)}</N></td>
-              <td role="cell" data-label="Setelah pajak (Rp)" className="key"><N>{fmtIdr(r.netIdr)}</N></td>
+              {cells(r)}
             </tr>
           ))}
         </tbody>
         <tfoot role="rowgroup">
           <tr role="row">
             <td role="cell" data-label="Kelompok">Total</td>
-            <td role="cell" data-label="Jumlah item"><N>{total.count}</N></td>
-            <td role="cell" data-label="Sebelum pajak"><N>{fmtUsd(total.gross)}</N></td>
-            <td role="cell" data-label="Pajak"><N>{fmtUsd(total.tax)}</N></td>
-            <td role="cell" data-label="Setelah pajak"><N>{fmtUsd(total.net)}</N></td>
-            <td role="cell" data-label="Setelah pajak (Rp)" className="key"><N>{fmtIdr(total.netIdr)}</N></td>
+            {cells({ ...total, netIdr: total.netIdr })}
           </tr>
         </tfoot>
       </table>
@@ -175,8 +182,8 @@ function Compare({ records }) {
                       {d.s.rows.map((x) => {
                         const sh = Math.round((x.net / d.s.total.net) * h);
                         return (
-                          <i key={x.key} style={{ height: sh, background: colorOf(data.codes.indexOf(x.key)) }}>
-                            {sh >= 18 ? x.key : null}
+                          <i key={x.key} {...sw(data.codes.indexOf(x.key), { height: sh })}>
+                            {sh >= 18 ? <b className="seg-key">{x.key}</b> : null}
                           </i>
                         );
                       })}
@@ -196,7 +203,7 @@ function Compare({ records }) {
         <N>{fmtIdr(cur.s.total.netIdr)}</N>
         <ul>
           {cur.s.rows.map((x) => (
-            <li key={x.key}><i style={{ background: colorOf(data.codes.indexOf(x.key)) }} />{x.key} <N>{fmtIdr(x.netIdr)}</N></li>
+            <li key={x.key}><i {...sw(data.codes.indexOf(x.key))} />{x.key} <N>{fmtIdr(x.netIdr)}</N></li>
           ))}
         </ul>
       </div>
@@ -275,15 +282,20 @@ export default function Page() {
   const [records, setRecords] = useState([]);
   const [toast, setToast] = useState("");
   const [ask, setAsk] = useState(null);
+  const [backupAt, setBackupAt] = useState(null);
   const fileRef = useRef(null);
   const toastTimer = useRef(null);
 
   useEffect(() => {
     setRecords(loadRecords());
+    setBackupAt(loadBackupAt());
     setSaveName(defaultName());
     const st = loadSettings();
     if (st && st.kurs > 0 && st.pajak >= 0) { setKurs(toInput(st.kurs)); setPajak(toInput(st.pajak)); }
   }, []);
+
+  // Jejak yang belum masuk cadangan terakhir (disimpan setelah cadangan terakhir diunduh)
+  const unbacked = records.filter((r) => !backupAt || r.savedAt > backupAt).length;
 
   const kursNum = parseNum(kurs);
   const pajakNum = parseNum(pajak);
@@ -375,6 +387,7 @@ export default function Page() {
     a.download = `jejak-pendapatan-${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(a.href);
+    setBackupAt(saveBackupAt());
     showToast("Cadangan diunduh.");
   }
 
@@ -402,7 +415,9 @@ export default function Page() {
         <a className="brand" href="#hitung"><Logo /> Ringkasan</a>
         <nav aria-label="Bagian halaman">
           <a className="pill" href="#hitung">Hitung</a>
-          <a className="pill" href="#jejak">Jejak</a>
+          <a className="pill" href="#jejak">
+            Jejak{unbacked > 0 && <><i className="dot" aria-hidden="true" /><span className="sr-only"> (ada yang belum dicadangkan)</span></>}
+          </a>
         </nav>
       </header>
 
@@ -495,6 +510,16 @@ export default function Page() {
 
       <section className="history" id="jejak">
         <h2>Jejak tersimpan</h2>
+        {unbacked > 0 && (
+          <div className="warn" role="status">
+            <Icon name="alert" size={20} />
+            <p>
+              <b>{backupAt ? `${unbacked} jejak belum dicadangkan.` : "Jejak belum pernah dicadangkan."}</b>{" "}
+              Data hanya ada di browser ini dan hilang jika data situs dihapus atau browser diganti.
+            </p>
+            <button type="button" className="btn primary" onClick={exportFile}>Unduh cadangan</button>
+          </div>
+        )}
         <Compare records={records} />
         {records.length === 0 ? (
           <p className="note">Belum ada jejak. Hitung dulu, beri nama, lalu tekan Simpan jejak.</p>
@@ -506,7 +531,7 @@ export default function Page() {
           </ul>
         )}
         <div className="backup">
-          {records.length > 0 && <button type="button" className="btn" onClick={exportFile}>Unduh cadangan</button>}
+          <button type="button" className="btn" onClick={exportFile} disabled={records.length === 0}>Unduh cadangan</button>
           <button type="button" className="btn" onClick={() => fileRef.current?.click()}>Impor cadangan</button>
           <input ref={fileRef} type="file" accept=".json,application/json" onChange={importFile} hidden />
         </div>
