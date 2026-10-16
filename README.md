@@ -27,8 +27,8 @@ membuka rincian, memuat ulang ke halaman utama, atau menghapus.
 
 ## Font
 
-Semua teks memakai Mortane DEMO dengan 9 bobot (Thin sampai Black) di `public/fonts/`. Heading memakai bobot 600-700,
-teks isi 400, label 500-600. Versi demo hanya berisi huruf A-Z dan a-z, jadi angka dan tanda baca memakai Open Sauce
+Semua teks memakai Mortane DEMO dengan bobot maksimal Medium (Thin sampai Medium) di `public/fonts/`. Heading dan label memakai 500,
+teks isi 400. Versi demo hanya berisi huruf A-Z dan a-z, jadi angka dan tanda baca memakai Open Sauce
 (family `Angka` di `globals.css`, dari CDN jsDelivr/Fontsource) dengan bobot yang mengikuti. Jika punya versi lengkap
 Mortane, cukup ganti file font. Versi demo biasanya tidak untuk pemakaian komersial.
 
