@@ -30,3 +30,10 @@ membuka rincian, memuat ulang ke halaman utama, atau menghapus.
 Heading memakai Instrument Serif (lewat `next/font/google` di `app/layout.js`) dan teks isi memakai
 Open Sauce (`@font-face` di `app/globals.css`, diambil dari CDN jsDelivr/Fontsource). Untuk self-host Open Sauce,
 taruh file `.woff2` di `public/fonts/` lalu ganti `url(...)` di `globals.css`.
+
+## Fitur tambahan
+
+- **Item teratas**: 10 item dengan pendapatan tertinggi, disimpan bersama jejak baru.
+- **Perbandingan antar jejak**: grafik batang bertumpuk per kode (muncul jika ada 2+ jejak).
+- **Cadangan**: unduh/impor semua jejak sebagai JSON.
+- **Kurs dan pajak terakhir** diingat di browser.

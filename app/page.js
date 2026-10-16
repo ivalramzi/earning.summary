@@ -2,7 +2,10 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { groupEarnings, computeSummary, fmtUsd, fmtIdr, fmtPct } from "../lib/summary";
-import { loadRecords, saveRecord, deleteRecord, recordExists } from "../lib/storage";
+import {
+  loadRecords, saveRecord, deleteRecord, recordExists,
+  loadSettings, saveSettings, exportRecords, importRecords,
+} from "../lib/storage";
 
 const BULAN = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
 const defaultName = () => {
@@ -40,6 +43,61 @@ function SummaryTable({ summary }) {
   );
 }
 
+const PALET = ["#bcb3f3", "#d4f46a", "#17171a", "#8f84ea", "#9ad0c2", "#e9b6a8"];
+const jt = (n) => (n / 1e6).toFixed(2).replace(".", ",") + " jt";
+
+function TopList({ top, kurs, pajak }) {
+  return (
+    <div className="top">
+      <h3>10 item teratas</h3>
+      <ol>
+        {top.map((t, i) => (
+          <li key={i}>
+            <span className="top-title">{t.title}</span>
+            <span>{fmtIdr(t.value * (1 - pajak / 100) * kurs)}</span>
+          </li>
+        ))}
+      </ol>
+    </div>
+  );
+}
+
+function Compare({ records }) {
+  const data = useMemo(() => {
+    const list = [...records]
+      .sort((a, b) => a.savedAt.localeCompare(b.savedAt))
+      .slice(-12)
+      .map((r) => ({ name: r.name, s: computeSummary({ groups: r.groups }, r.kurs, r.pajak) }));
+    const codes = [...new Set(list.flatMap((d) => d.s.rows.map((x) => x.key)))].sort();
+    return { list, codes, max: Math.max(...list.map((d) => d.s.total.netIdr)) };
+  }, [records]);
+  if (records.length < 2) return null;
+  const color = (c) => PALET[data.codes.indexOf(c) % PALET.length];
+  return (
+    <div className="compare">
+      <h3>Perbandingan antar jejak (setelah pajak)</h3>
+      <div className="bars">
+        {data.list.map((d) => (
+          <div className="bar" key={d.name}>
+            <span className="bar-val">{jt(d.s.total.netIdr)}</span>
+            <div className="bar-col" style={{ height: Math.max(6, Math.round((d.s.total.netIdr / data.max) * 200)) }}>
+              {d.s.rows.map((x) => (
+                <i key={x.key} style={{ flexGrow: x.net, background: color(x.key) }} title={`${x.key}: ${fmtIdr(x.netIdr)}`} />
+              ))}
+            </div>
+            <span className="bar-name">{d.name}</span>
+          </div>
+        ))}
+      </div>
+      <ul className="legend">
+        {data.codes.map((c) => (
+          <li key={c}><i style={{ background: color(c) }} />{c}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 function SavedItem({ rec, onLoad, onDelete }) {
   const [open, setOpen] = useState(false);
   const s = useMemo(() => computeSummary({ groups: rec.groups }, rec.kurs, rec.pajak), [rec]);
@@ -56,6 +114,7 @@ function SavedItem({ rec, onLoad, onDelete }) {
       {open && (
         <div className="saved-body">
           <SummaryTable summary={s} />
+          {rec.top?.length ? <TopList top={rec.top} kurs={rec.kurs} pajak={rec.pajak} /> : null}
           <div className="actions">
             <button type="button" onClick={() => onLoad(rec)}>Muat ke atas</button>
             <button type="button" className="danger" onClick={() => onDelete(rec)}>Hapus</button>
@@ -77,15 +136,22 @@ export default function Page() {
   const [saveName, setSaveName] = useState("");
   const [saveMsg, setSaveMsg] = useState("");
   const [records, setRecords] = useState([]);
+  const [backupMsg, setBackupMsg] = useState("");
 
   useEffect(() => {
     setRecords(loadRecords());
     setSaveName(defaultName());
+    const st = loadSettings();
+    if (st) { setKurs(String(st.kurs)); setPajak(String(st.pajak)); }
   }, []);
 
   const kursNum = parseFloat(kurs);
   const pajakNum = parseFloat(pajak);
   const inputsOk = kursNum > 0 && !Number.isNaN(pajakNum) && pajakNum >= 0;
+
+  useEffect(() => {
+    if (inputsOk) saveSettings({ kurs: kursNum, pajak: pajakNum });
+  }, [inputsOk, kursNum, pajakNum]);
 
   const summary = useMemo(
     () => (parsed && inputsOk ? computeSummary(parsed, kursNum, pajakNum) : null),
@@ -132,7 +198,7 @@ export default function Page() {
     if (!name) { setSaveMsg("Isi nama jejak dulu."); return; }
     if (recordExists(name) && !window.confirm(`Jejak "${name}" sudah ada. Timpa dengan hasil ini?`)) return;
     try {
-      setRecords(saveRecord({ name, kurs: kursNum, pajak: pajakNum, groups: parsed.groups }));
+      setRecords(saveRecord({ name, kurs: kursNum, pajak: pajakNum, groups: parsed.groups, top: parsed.top }));
       setSaveMsg(`Tersimpan sebagai "${name}".`);
     } catch {
       setSaveMsg("Gagal menyimpan. Penyimpanan browser mungkin dinonaktifkan.");
@@ -140,7 +206,7 @@ export default function Page() {
   }
 
   function loadRecord(rec) {
-    setParsed({ groups: rec.groups, skipped: 0 });
+    setParsed({ groups: rec.groups, skipped: 0, top: rec.top || [] });
     setKurs(String(rec.kurs));
     setPajak(String(rec.pajak));
     setFileName(`Jejak: ${rec.name}`);
@@ -152,6 +218,34 @@ export default function Page() {
 
   function removeRecord(rec) {
     if (window.confirm(`Hapus jejak "${rec.name}"?`)) setRecords(deleteRecord(rec.id));
+  }
+
+function exportFile() {
+    const blob = new Blob([exportRecords()], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `jejak-pendapatan-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    setBackupMsg("Cadangan diunduh.");
+  }
+
+  function importFile(e) {
+    const file = e.target.files[0];
+    e.target.value = "";
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const { list, count } = importRecords(String(reader.result));
+        setRecords(list);
+        setBackupMsg(`${count} jejak diimpor. Nama yang sama menimpa jejak lama.`);
+      } catch (err) {
+        setBackupMsg(err instanceof SyntaxError ? "File bukan JSON yang valid." : err.message);
+      }
+    };
+    reader.onerror = () => setBackupMsg("File tidak bisa dibaca.");
+    reader.readAsText(file);
   }
 
   return (
@@ -203,6 +297,7 @@ export default function Page() {
           </div>
 
           <SummaryTable summary={summary} />
+          {parsed.top?.length ? <TopList top={parsed.top} kurs={kursNum} pajak={pajakNum} /> : null}
 
           <p className="note">
             Kode diambil dari 3 angka di akhir judul. Judul tanpa kode masuk ke "Lainnya".
@@ -223,6 +318,7 @@ export default function Page() {
 
       <section className="history">
         <h2>Jejak tersimpan</h2>
+        <Compare records={records} />
         {records.length === 0 ? (
           <p className="note">Belum ada jejak. Hitung dulu, beri nama, lalu tekan Simpan.</p>
         ) : (
@@ -232,6 +328,14 @@ export default function Page() {
             ))}
           </ul>
         )}
+        <div className="backup">
+          <button type="button" onClick={exportFile} disabled={!records.length}>Unduh cadangan</button>
+          <label className="btnlike">
+            Impor cadangan
+            <input type="file" accept=".json,application/json" onChange={importFile} hidden />
+          </label>
+        </div>
+        {backupMsg && <p className="note" role="status">{backupMsg}</p>}
         <p className="note">Jejak disimpan di browser ini saja. Menghapus data situs atau memakai browser lain akan menghilangkannya.</p>
       </section>
     </main>
