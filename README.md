@@ -27,9 +27,10 @@ membuka rincian, memuat ulang ke halaman utama, atau menghapus.
 
 ## Font
 
-Heading memakai Mortane DEMO (`public/fonts/MortaneDEMO-Regular.ttf`) dan teks isi memakai Open Sauce
-(diambil dari CDN jsDelivr/Fontsource). Mortane DEMO hanya berisi huruf A-Z dan a-z, jadi angka dan tanda baca
-otomatis memakai Open Sauce. Versi demo biasanya tidak untuk pemakaian komersial; beli versi lengkapnya jika perlu.
+Semua teks memakai Mortane DEMO (`public/fonts/MortaneDEMO-Regular.ttf`). Versi demo hanya berisi huruf A-Z dan a-z,
+jadi angka dan tanda baca otomatis memakai Open Sauce (bobot 500, dari CDN jsDelivr/Fontsource, family `Angka` di `globals.css`).
+Jika punya versi lengkap Mortane, cukup ganti file font; Open Sauce otomatis tidak terpakai lagi.
+Versi demo biasanya tidak untuk pemakaian komersial.
 
 ## Fitur tambahan
 

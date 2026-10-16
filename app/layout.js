@@ -1,6 +1,6 @@
 import "./globals.css";
 
-// Heading: Mortane (public/fonts). Body: Open Sauce. Keduanya dimuat lewat @font-face di globals.css.
+// Semua teks memakai Mortane (public/fonts); angka & tanda baca meminjam Open Sauce. Lihat globals.css.
 export const metadata = {
   title: "Ringkasan Pendapatan",
   description: "Unggah CSV pendapatan dan lihat total per kode, pajak, dan nilai rupiah.",
