@@ -27,9 +27,9 @@ membuka rincian, memuat ulang ke halaman utama, atau menghapus.
 
 ## Font
 
-Heading memakai Instrument Serif (lewat `next/font/google` di `app/layout.js`) dan teks isi memakai
-Open Sauce (`@font-face` di `app/globals.css`, diambil dari CDN jsDelivr/Fontsource). Untuk self-host Open Sauce,
-taruh file `.woff2` di `public/fonts/` lalu ganti `url(...)` di `globals.css`.
+Heading memakai Mortane DEMO (`public/fonts/MortaneDEMO-Regular.ttf`) dan teks isi memakai Open Sauce
+(diambil dari CDN jsDelivr/Fontsource). Mortane DEMO hanya berisi huruf A-Z dan a-z, jadi angka dan tanda baca
+otomatis memakai Open Sauce. Versi demo biasanya tidak untuk pemakaian komersial; beli versi lengkapnya jika perlu.
 
 ## Fitur tambahan
 

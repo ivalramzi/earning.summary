@@ -1,15 +1,6 @@
-import { Instrument_Serif } from "next/font/google";
 import "./globals.css";
 
-// Heading: Instrument Serif. Body: Open Sauce (dimuat lewat @font-face di globals.css).
-const heading = Instrument_Serif({
-  subsets: ["latin"],
-  weight: "400",
-  style: ["normal", "italic"],
-  display: "swap",
-  variable: "--font-heading",
-});
-
+// Heading: Mortane (public/fonts). Body: Open Sauce. Keduanya dimuat lewat @font-face di globals.css.
 export const metadata = {
   title: "Ringkasan Pendapatan",
   description: "Unggah CSV pendapatan dan lihat total per kode, pajak, dan nilai rupiah.",
@@ -19,7 +10,7 @@ export const viewport = { width: "device-width", initialScale: 1, viewportFit: "
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="id" className={heading.variable}>
+    <html lang="id">
       <body>{children}</body>
     </html>
   );
