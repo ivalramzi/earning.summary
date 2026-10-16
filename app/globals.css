@@ -115,3 +115,47 @@ button.danger{color:var(--err)}
 .btnlike{display:inline-block;font-size:14px;font-weight:500;background:var(--card);border:1px solid #dedbea;border-radius:999px;padding:11px 22px;cursor:pointer}
 .btnlike:hover,.btnlike:focus-within{border-color:var(--ink)}
 button:disabled{opacity:.45;cursor:not-allowed}
+
+/* ===== Mobile ===== */
+html{-webkit-text-size-adjust:100%}
+body{min-height:100dvh}
+main{min-width:0;padding-left:max(20px,env(safe-area-inset-left));padding-right:max(20px,env(safe-area-inset-right));padding-bottom:calc(72px + env(safe-area-inset-bottom))}
+button,.btnlike,.drop{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+
+@media (max-width:640px){
+  main{padding-top:28px;padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}
+  .sub{margin-bottom:22px}
+  .drop{padding:34px 18px}
+
+  /* Target sentuh >= 46px, font 16px agar iOS tidak zoom saat fokus */
+  input[type=number],input[type=text]{font-size:16px;min-height:48px}
+  button,.btnlike{min-height:46px;display:inline-flex;align-items:center;justify-content:center}
+  .opts{flex-direction:column;gap:14px}
+  .opts label{flex-basis:auto}
+  .save label{flex-basis:100%}
+  .save button{flex:1 1 calc(50% - 5px)}
+  .backup>*{flex:1 1 calc(50% - 5px)}
+  .actions button{flex:1}
+
+  .hero{padding:22px 20px 18px}
+  .hero .big{font-size:clamp(32px,10.5vw,46px)}
+  .history{margin-top:44px}
+  .saved-head{padding:16px 18px}
+  .saved-body{padding:4px 14px 16px}
+  .top{padding:16px 18px}
+  .compare{padding:18px}
+  .bar{flex:0 0 72px}
+
+  /* Tabel menjadi kartu per kode */
+  .scroll{background:transparent;border-radius:0;overflow:visible}
+  .scroll table,.scroll tbody,.scroll tfoot,.scroll tr,.scroll td{display:block;width:100%;min-width:0}
+  .scroll thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+  .scroll tbody tr,.scroll tfoot tr{background:var(--card);border-radius:20px;padding:8px 0;margin-bottom:10px}
+  .scroll tfoot tr{background:var(--lav)}
+  .scroll td,.scroll tfoot td{display:flex;justify-content:space-between;align-items:baseline;gap:14px;padding:7px 18px;border:0;background:transparent;white-space:normal;text-align:right}
+  .scroll td::before{content:attr(data-label);color:var(--muted);font-weight:500;font-size:13px;text-align:left}
+  .scroll tfoot td::before{color:var(--ink);opacity:.7}
+  .scroll td:first-child{padding:8px 18px 4px;font-size:20px;font-weight:600;justify-content:flex-start}
+  .scroll td:first-child::before{content:none}
+  .scroll td:last-child{font-weight:600}
+}

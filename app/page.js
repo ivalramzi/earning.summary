@@ -26,16 +26,16 @@ function SummaryTable({ summary }) {
         <tbody>
           {summary.rows.map((r) => (
             <tr key={r.key}>
-              <td>{r.key}</td><td>{r.count}</td><td>{fmtUsd(r.gross)}</td>
-              <td>{fmtUsd(r.tax)}</td><td>{fmtUsd(r.net)}</td><td>{fmtIdr(r.netIdr)}</td>
+              <td data-label="Kode">{r.key}</td><td data-label="Item">{r.count}</td><td data-label="Sebelum pajak">{fmtUsd(r.gross)}</td>
+              <td data-label="Pajak">{fmtUsd(r.tax)}</td><td data-label="Setelah pajak">{fmtUsd(r.net)}</td><td data-label="Setelah pajak (Rp)">{fmtIdr(r.netIdr)}</td>
             </tr>
           ))}
         </tbody>
         <tfoot>
           <tr>
-            <td>Total</td><td>{summary.total.count}</td><td>{fmtUsd(summary.total.gross)}</td>
-            <td>{fmtUsd(summary.total.tax)}</td><td>{fmtUsd(summary.total.net)}</td>
-            <td>{fmtIdr(summary.total.netIdr)}</td>
+            <td data-label="Kode">Total</td><td data-label="Item">{summary.total.count}</td><td data-label="Sebelum pajak">{fmtUsd(summary.total.gross)}</td>
+            <td data-label="Pajak">{fmtUsd(summary.total.tax)}</td><td data-label="Setelah pajak">{fmtUsd(summary.total.net)}</td>
+            <td data-label="Setelah pajak (Rp)">{fmtIdr(summary.total.netIdr)}</td>
           </tr>
         </tfoot>
       </table>

@@ -6,7 +6,7 @@ export const metadata = {
   description: "Unggah CSV pendapatan dan lihat total per kode, pajak, dan nilai rupiah.",
 };
 
-export const viewport = { width: "device-width", initialScale: 1, viewportFit: "cover" };
+export const viewport = { width: "device-width", initialScale: 1, viewportFit: "cover", themeColor: "#e7e6e4" };
 
 export default function RootLayout({ children }) {
   return (
