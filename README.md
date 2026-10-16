@@ -24,3 +24,9 @@ Setelah menghitung, isi nama jejak (default: bulan dan tahun saat ini, bisa diga
 Jejak tersimpan di `localStorage` browser (lihat `lib/storage.js`): total per kode, kurs, dan pajak.
 Nama yang sama akan menimpa jejak lama setelah konfirmasi. Di bagian "Jejak tersimpan" Anda bisa
 membuka rincian, memuat ulang ke halaman utama, atau menghapus.
+
+## Font
+
+Heading memakai Instrument Serif (lewat `next/font/google` di `app/layout.js`) dan teks isi memakai
+Open Sauce (`@font-face` di `app/globals.css`, diambil dari CDN jsDelivr/Fontsource). Untuk self-host Open Sauce,
+taruh file `.woff2` di `public/fonts/` lalu ganti `url(...)` di `globals.css`.

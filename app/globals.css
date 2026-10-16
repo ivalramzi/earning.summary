@@ -1,49 +1,86 @@
-:root{--bg:#eef1f4;--surface:#fff;--ink:#14202b;--muted:#5b6b7a;--line:#d5dce3;--accent:#0b5d57;--accent-ink:#fff;--soft:#dcefed;--err:#b3261e}
-@media (prefers-color-scheme:dark){:root{--bg:#10171d;--surface:#18222a;--ink:#e8eef3;--muted:#92a3b2;--line:#2b3946;--accent:#4fc3b8;--accent-ink:#06211e;--soft:#16332f;--err:#ff8a80}}
+/* Open Sauce (OFL). Jika tidak termuat, tampil font sistem. Untuk self-host, taruh file .woff2 di public/fonts dan ganti url(). */
+@font-face{font-family:"Open Sauce";font-style:normal;font-weight:400;font-display:swap;src:url("https://cdn.jsdelivr.net/fontsource/fonts/open-sauce-sans@latest/latin-400-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sauce";font-style:normal;font-weight:500;font-display:swap;src:url("https://cdn.jsdelivr.net/fontsource/fonts/open-sauce-sans@latest/latin-500-normal.woff2") format("woff2")}
+@font-face{font-family:"Open Sauce";font-style:normal;font-weight:600;font-display:swap;src:url("https://cdn.jsdelivr.net/fontsource/fonts/open-sauce-sans@latest/latin-600-normal.woff2") format("woff2")}
+
+:root{
+  --bg:#e7e6e4;--card:#fff;--ink:#17171a;--muted:#6d6c76;--line:#ece9f4;
+  --lav:#bcb3f3;--lav-soft:#d9d4fa;--lav-pale:#f0edfd;--lime:#d4f46a;--field:#f2f1f5;--err:#b3261e;
+  --body:"Open Sauce","Open Sauce Sans","Open Sauce One",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --head:var(--font-heading),"Instrument Serif",Georgia,serif;
+  color-scheme:light;
+}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-size:16px;line-height:1.5}
-main{max-width:860px;margin:0 auto;padding:28px 18px 56px}
-h1{font-size:clamp(28px,5vw,40px);line-height:1.1;font-weight:700;margin:0 0 6px;letter-spacing:-.02em}
-.sub{color:var(--muted);margin:0 0 24px}
-.drop{display:block;position:relative;border:2px dashed var(--line);background:var(--surface);border-radius:10px;padding:34px 18px;text-align:center;cursor:pointer}
-.drop:hover,.drop.over,.drop:focus-within{border-color:var(--accent);background:var(--soft)}
-.drop b{display:block;font-size:18px}
-.drop span{color:var(--muted);font-size:14px}
+body{
+  margin:0;color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.55;
+  background:radial-gradient(1100px 480px at 15% -8%,#f6f5f3,transparent 70%),var(--bg);
+  min-height:100vh;
+}
+main{max-width:920px;margin:0 auto;padding:44px 20px 72px}
+
+h1,h2{font-family:var(--head);font-weight:400;letter-spacing:-.01em}
+h1{font-size:clamp(46px,8.5vw,76px);line-height:1;margin:0 0 14px}
+.sub{color:var(--muted);margin:0 0 28px;max-width:54ch}
+
+/* Unggah */
+.drop{display:block;position:relative;background:var(--card);border:1.5px dashed #cdc7ee;border-radius:28px;padding:42px 22px;text-align:center;cursor:pointer;transition:background .15s,border-color .15s}
+.drop:hover,.drop.over,.drop:focus-within{background:var(--lav-pale);border-color:var(--lav)}
+.drop b{display:block;font-size:17px;font-weight:600;margin-bottom:4px}
+.drop span{color:var(--muted);font-size:13.5px}
 .drop input{position:absolute;opacity:0;width:1px;height:1px}
-.opts{display:flex;gap:14px;flex-wrap:wrap;margin:18px 0}
-.opts label{display:flex;flex-direction:column;gap:4px;font-size:14px;color:var(--muted);flex:1 1 200px}
-.opts input{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:9px 11px}
-.opts input:focus,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.hero{background:var(--accent);color:var(--accent-ink);border-radius:10px;padding:22px 22px 20px;margin-bottom:16px}
-.hero small{display:block;opacity:.85;font-size:14px}
-.hero .big{font-size:clamp(30px,7vw,48px);line-height:1.1;font-weight:700;margin:4px 0 8px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
-.hero p{margin:0;opacity:.9;font-size:14px}
-.scroll{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:10px}
-table{border-collapse:collapse;width:100%;min-width:640px;font-variant-numeric:tabular-nums}
-th,td{padding:11px 14px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
-th:first-child,td:first-child{text-align:left}
-th{font-weight:600;font-size:14px;color:var(--muted)}
+
+/* Kurs & pajak */
+.opts{display:flex;gap:16px;flex-wrap:wrap;background:var(--card);border-radius:28px;padding:22px;margin:16px 0}
+.opts label{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:500;color:var(--muted);flex:1 1 200px}
+input[type=number],input[type=text]{font:inherit;font-size:15px;color:var(--ink);background:var(--field);border:1px solid transparent;border-radius:999px;padding:12px 18px;width:100%}
+input[type=number]:focus,input[type=text]:focus,button:focus-visible,.saved-head:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+
+.msg{margin:14px 4px;color:var(--err);font-weight:500}
+.note{color:var(--muted);font-size:13px;margin:14px 4px 0}
+
+/* Total */
+.hero{background:var(--lav);color:var(--ink);border-radius:28px;padding:30px 30px 26px;margin:16px 0}
+.hero small{display:block;font-size:13.5px;font-weight:500;opacity:.75}
+.hero .big{font-family:var(--head);font-weight:400;font-size:clamp(42px,9.5vw,76px);line-height:1.05;margin:6px 0 10px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.hero p{margin:0;font-size:13.5px;opacity:.8}
+
+/* Tabel */
+.scroll{overflow-x:auto;background:var(--card);border-radius:28px}
+table{border-collapse:collapse;width:100%;min-width:660px;font-variant-numeric:tabular-nums}
+th,td{padding:14px 18px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--line)}
+th:first-child,td:first-child{text-align:left;padding-left:26px}
+th:last-child,td:last-child{padding-right:26px}
+th{font-size:13px;font-weight:500;color:var(--muted);padding-top:20px}
 tbody tr:last-child td{border-bottom:0}
-tfoot td{font-weight:600;background:var(--soft);border-bottom:0}
-.msg{margin:14px 0;color:var(--err);font-weight:500}
-.note{color:var(--muted);font-size:13px;margin-top:14px}
-button{font:inherit;font-weight:500;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:8px 14px;cursor:pointer;margin-top:14px}
-button:hover{border-color:var(--accent)}
-.save{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-top:16px}
-.save label{display:flex;flex-direction:column;gap:4px;font-size:14px;color:var(--muted);flex:1 1 220px}
-.save input{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:9px 11px}
-.save input:focus{outline:2px solid var(--accent);outline-offset:2px}
-.save button{margin-top:0}
-button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+tfoot td{font-weight:600;background:var(--lav-pale);border-bottom:0}
+
+/* Tombol */
+button{font:inherit;font-size:14px;font-weight:500;color:var(--ink);background:var(--card);border:1px solid #dedbea;border-radius:999px;padding:11px 22px;cursor:pointer;transition:border-color .15s,background .15s}
+button:hover{border-color:var(--ink)}
+button.primary{background:var(--lime);border-color:var(--lime);font-weight:600}
+button.primary:hover{border-color:var(--ink)}
 button.danger{color:var(--err)}
-.history{margin-top:40px}
-.history h2{font-size:22px;margin:0 0 12px}
-.saved{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
-.saved-item{background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden}
-.saved-head{display:grid;grid-template-columns:1fr auto;gap:2px 12px;width:100%;text-align:left;margin:0;border:0;border-radius:0;background:transparent;padding:14px 16px}
-.saved-name{font-weight:600}
-.saved-idr{font-weight:600;font-variant-numeric:tabular-nums}
-.saved-meta{grid-column:1/-1;color:var(--muted);font-size:13px}
-.saved-body{padding:0 16px 16px}
-.saved-body .scroll{border-radius:8px}
-.actions{display:flex;gap:10px}
+
+/* Simpan */
+.save{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;background:var(--card);border-radius:28px;padding:20px 22px;margin-top:16px}
+.save label{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:500;color:var(--muted);flex:1 1 220px}
+
+/* Jejak tersimpan */
+.history{margin-top:56px}
+.history h2{font-size:clamp(32px,5vw,44px);line-height:1.05;margin:0 0 16px}
+.saved{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+.saved-item{background:var(--card);border-radius:24px;overflow:hidden}
+.saved-head{display:grid;grid-template-columns:1fr auto;gap:2px 14px;align-items:baseline;width:100%;text-align:left;margin:0;border:0;border-radius:0;background:transparent;padding:18px 24px}
+.saved-head:hover,.saved-head[aria-expanded="true"]{background:var(--lav-pale)}
+.saved-name{font-size:15px;font-weight:600}
+.saved-idr{font-family:var(--head);font-size:28px;line-height:1.1;font-variant-numeric:tabular-nums}
+.saved-meta{grid-column:1/-1;color:var(--muted);font-size:13px;font-weight:400}
+.saved-body{padding:4px 20px 20px;background:var(--lav-pale)}
+.saved-body .scroll{border-radius:20px}
+.actions{display:flex;gap:10px;margin-top:14px}
+
+@media (max-width:520px){
+  main{padding-top:32px}
+  .hero{padding:24px 22px 20px}
+  .opts,.save{padding:18px}
+}

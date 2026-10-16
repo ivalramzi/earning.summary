@@ -1,7 +1,14 @@
-import { DM_Sans } from "next/font/google";
+import { Instrument_Serif } from "next/font/google";
 import "./globals.css";
 
-const font = DM_Sans({ subsets: ["latin"], display: "swap" });
+// Heading: Instrument Serif. Body: Open Sauce (dimuat lewat @font-face di globals.css).
+const heading = Instrument_Serif({
+  subsets: ["latin"],
+  weight: "400",
+  style: ["normal", "italic"],
+  display: "swap",
+  variable: "--font-heading",
+});
 
 export const metadata = {
   title: "Ringkasan Pendapatan",
@@ -12,8 +19,8 @@ export const viewport = { width: "device-width", initialScale: 1, viewportFit: "
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="id">
-      <body className={font.className}>{children}</body>
+    <html lang="id" className={heading.variable}>
+      <body>{children}</body>
     </html>
   );
 }
