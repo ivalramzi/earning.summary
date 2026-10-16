@@ -60,7 +60,7 @@ function ShareBar({ rows, total }) {
       </div>
       <ul className="share-legend">
         {rows.map((r, i) => (
-          <li key={r.key}><i {...sw(i)} />{r.key} <N>{pct(r)}%</N></li>
+          <li key={r.key}><i {...sw(i)} /><span>{r.key === "Lainnya" ? r.key : <N>{r.key}</N>}</span><N>{pct(r)}%</N></li>
         ))}
       </ul>
     </>
@@ -203,7 +203,7 @@ function Compare({ records }) {
         <N>{fmtIdr(cur.s.total.netIdr)}</N>
         <ul>
           {cur.s.rows.map((x) => (
-            <li key={x.key}><i {...sw(data.codes.indexOf(x.key))} />{x.key} <N>{fmtIdr(x.netIdr)}</N></li>
+            <li key={x.key}><i {...sw(data.codes.indexOf(x.key))} /><span>{x.key === "Lainnya" ? x.key : <N>{x.key}</N>}</span><N>{fmtIdr(x.netIdr)}</N></li>
           ))}
         </ul>
       </div>
