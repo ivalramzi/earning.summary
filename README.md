@@ -44,6 +44,10 @@ agar sama dengan `--body`. Versi demo Mortane biasanya tidak untuk pemakaian kom
 
 ## Tampilan
 
+- Gaya mengikuti dashboard monokrom berkaca: bingkai kaca buram, blob putih glossy di latar, kartu putih dan hitam bersudut besar, tombol pil hitam. Warna ada di variabel `:root` pada `globals.css` (`--solid` dan `--on-solid` otomatis terbalik di mode gelap).
+- Tata letak bento di layar lebar (1180px ke atas): panel menu kiri (Hitung, Rincian, Teratas, Jejak, Cadangan; menu aktif mengikuti scroll), baris pil di atas (Unggah CSV, kurs dan pajak, status file, tombol bulat impor dan unduh cadangan dengan badge jumlah jejak belum dicadangkan), lalu baris isian | komposisi | total, kartu Rincian dengan tabel di panel hitam, item teratas dua kolom, dan jejak berbentuk pil bergaris. Layar sempit: satu kolom, menu jadi bilah ikon di atas, tabel jadi kartu.
+- Grafik memakai nada abu-abu yang dibedakan lagi dengan pola (palet di `PAL` pada `app/page.js`).
+
 - Desktop: dua kolom (unggah dan pengaturan di kiri, hasil di kanan). Mobile: satu kolom, tabel menjadi kartu.
 - Mode terang dan gelap mengikuti pengaturan perangkat.
 - Tabel: kolom Rupiah ada di depan, dan kolom Kelompok tetap terlihat saat tabel digeser.
