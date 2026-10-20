@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   groupEarnings, computeSummary, fmtUsd, fmtIdr, fmtPct, parseNum, recordTime,
+  fmtUsdS, fmtIdrS, mergeGroups, computeCorrection,
 } from "../lib/summary";
 import {
   loadRecords, saveRecord, deleteRecord, recordExists,
@@ -98,6 +99,44 @@ function SummaryTable({ summary }) {
             <td role="cell" data-label="Pajak"><N>{fmtUsd(total.tax)}</N></td>
             <td role="cell" data-label="Setelah pajak"><N>{fmtUsd(total.net)}</N></td>
             <td role="cell" data-label="Setelah pajak (Rp)" className="key"><N>{fmtIdr(total.netIdr)}</N></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  );
+}
+
+function CorrTable({ correction }) {
+  const { rows, total } = correction;
+  const heads = ["Kelompok", "Sebelum pajak", "Pajak sebelumnya", "Pajak saat ini", "Belum diterima", "Belum diterima (Rp)"];
+  const cells = (r) => [
+    [heads[1], fmtUsd(r.gross)], [heads[2], fmtUsd(r.taxOld)], [heads[3], fmtUsd(r.taxNew)],
+    [heads[4], fmtUsdS(r.diff)], [heads[5], fmtIdrS(r.diffIdr)],
+  ];
+  const body = (r, label) =>
+    cells(r).map(([h, v], i) => (
+      <td key={h} role="cell" data-label={h} className={i === 4 ? "key" : undefined}><N>{v}</N></td>
+    ));
+  return (
+    <div className="scroll">
+      <table role="table">
+        <thead role="rowgroup">
+          <tr role="row">{heads.map((h) => <th key={h} role="columnheader" scope="col">{h}</th>)}</tr>
+        </thead>
+        <tbody role="rowgroup">
+          {rows.map((r) => (
+            <tr key={r.key} role="row">
+              <td role="cell" data-label="Kelompok">
+                {r.key === "Lainnya" ? "Lainnya" : <><span className="pfx">Kode </span><N>{r.key}</N></>}
+              </td>
+              {body(r)}
+            </tr>
+          ))}
+        </tbody>
+        <tfoot role="rowgroup">
+          <tr role="row">
+            <td role="cell" data-label="Kelompok">Total</td>
+            {body(total)}
           </tr>
         </tfoot>
       </table>
@@ -269,6 +308,8 @@ export default function Page() {
   const [error, setError] = useState("");
   const [kurs, setKurs] = useState("17494,13946");
   const [pajak, setPajak] = useState("2,66");
+  const [pajakLama, setPajakLama] = useState("");
+  const [picked, setPicked] = useState([]);
   const [over, setOver] = useState(false);
   const [saveName, setSaveName] = useState("");
   const [nameErr, setNameErr] = useState("");
@@ -283,6 +324,7 @@ export default function Page() {
     setSaveName(defaultName());
     const st = loadSettings();
     if (st && st.kurs > 0 && st.pajak >= 0) { setKurs(toInput(st.kurs)); setPajak(toInput(st.pajak)); }
+    if (st?.pajakLama) setPajakLama(st.pajakLama);
   }, []);
 
   const kursNum = parseNum(kurs);
@@ -290,12 +332,29 @@ export default function Page() {
   const inputsOk = kursNum > 0 && !Number.isNaN(pajakNum) && pajakNum >= 0;
 
   useEffect(() => {
-    if (inputsOk) saveSettings({ kurs: kursNum, pajak: pajakNum });
-  }, [inputsOk, kursNum, pajakNum]);
+    if (inputsOk) saveSettings({ kurs: kursNum, pajak: pajakNum, pajakLama });
+  }, [inputsOk, kursNum, pajakNum, pajakLama]);
 
   const summary = useMemo(
     () => (parsed && inputsOk ? computeSummary(parsed, kursNum, pajakNum) : null),
     [parsed, inputsOk, kursNum, pajakNum]
+  );
+
+  const pajakLamaNum = parseNum(pajakLama);
+  const sortedRecords = useMemo(
+    () => [...records].sort((a, b) => recordTime(a.name, a.savedAt) - recordTime(b.name, b.savedAt)),
+    [records]
+  );
+  const corrSource = useMemo(() => {
+    const chosen = sortedRecords.filter((r) => picked.includes(r.id));
+    if (chosen.length) return { groups: mergeGroups(chosen.map((r) => r.groups)), label: `${chosen.length} jejak digabung` };
+    if (parsed) return { groups: parsed.groups, label: fileName || "Data yang sedang dimuat" };
+    return null;
+  }, [sortedRecords, picked, parsed, fileName]);
+  const correction = useMemo(
+    () => (corrSource && inputsOk && pajakLamaNum >= 0
+      ? computeCorrection(corrSource.groups, kursNum, pajakLamaNum, pajakNum) : null),
+    [corrSource, inputsOk, kursNum, pajakLamaNum, pajakNum]
   );
 
   function showToast(msg) {
@@ -402,6 +461,7 @@ export default function Page() {
         <a className="brand" href="#hitung"><Logo /> Ringkasan</a>
         <nav aria-label="Bagian halaman">
           <a className="pill" href="#hitung">Hitung</a>
+          <a className="pill" href="#koreksi">Koreksi</a>
           <a className="pill" href="#jejak">Jejak</a>
         </nav>
       </header>
@@ -492,6 +552,83 @@ export default function Page() {
           )}
         </div>
       </div>
+
+      <section className="correction" id="koreksi">
+        <h2>Koreksi pajak</h2>
+        <p className="sub">
+          Hitung gaji yang belum diterima: pajak sebelumnya dikurangi pajak saat ini, tetap per kode 001 sampai 005.
+        </p>
+        <div className="corr-setup">
+          <div className="corr-inputs">
+            <label>
+              Pajak sebelumnya (%)
+              <input className="num" type="text" inputMode="decimal" value={pajakLama} placeholder="Isi tarif lama"
+                aria-invalid={pajakLama !== "" && !(pajakLamaNum >= 0)} onChange={(e) => setPajakLama(e.target.value)} />
+            </label>
+            <p className="hint">
+              Pajak saat ini mengikuti kolom Pajak di atas ({Number.isNaN(pajakNum) ? "-" : <N>{fmtPct(pajakNum)}%</N>}), begitu juga kurs.
+            </p>
+          </div>
+          <fieldset className="picker">
+            <legend>Data yang dihitung</legend>
+            {sortedRecords.length ? (
+              <>
+                <p className="hint">
+                  Centang jejak bulanan untuk digabung, misalnya Juli 2025 sampai Februari 2026.
+                  Tanpa centang, dipakai data yang sedang dimuat di atas.
+                </p>
+                <div className="checks">
+                  {sortedRecords.map((r) => (
+                    <label key={r.id} className="check">
+                      <input type="checkbox" checked={picked.includes(r.id)}
+                        onChange={() => setPicked((p) => (p.includes(r.id) ? p.filter((x) => x !== r.id) : [...p, r.id]))} />
+                      <span>{r.name}</span>
+                    </label>
+                  ))}
+                </div>
+                <div className="actions">
+                  <button type="button" className="btn" onClick={() => setPicked(sortedRecords.map((r) => r.id))}>Pilih semua</button>
+                  <button type="button" className="btn" onClick={() => setPicked([])}>Kosongkan</button>
+                </div>
+              </>
+            ) : (
+              <p className="hint">Belum ada jejak tersimpan. Dihitung dari data yang sedang dimuat di atas.</p>
+            )}
+          </fieldset>
+        </div>
+
+        {correction ? (
+          <>
+            <div className="hero">
+              <small>Gaji yang belum diterima (pajak sebelumnya − pajak saat ini)</small>
+              <div className="big num">{fmtIdrS(correction.total.diffIdr)}</div>
+              <dl className="stats">
+                <div><dt>Dalam USD</dt><dd><N>{fmtUsdS(correction.total.diff)}</N></dd></div>
+                <div><dt>Pendapatan sebelum pajak</dt><dd><N>{fmtUsd(correction.total.gross)}</N></dd></div>
+                <div><dt>Sumber data</dt><dd>{corrSource.label}</dd></div>
+              </dl>
+              {correction.total.diff < 0 && (
+                <p className="hero-note">Pajak sebelumnya lebih kecil dari pajak saat ini, jadi hasilnya negatif.</p>
+              )}
+            </div>
+            <CorrTable correction={correction} />
+            <p className="note">
+              Ini perkiraan: pajak sebelumnya dihitung dari seluruh pendapatan di data. Jika tarif lama hanya berlaku untuk
+              sebagian penjualan (misalnya pembeli tertentu), hasilnya bisa lebih besar dari kenyataan. Bandingkan dengan
+              angka resmi di dasbor penulis.
+            </p>
+          </>
+        ) : (
+          <div className="empty">
+            <h2>Belum ada hasil</h2>
+            <p>
+              {!corrSource
+                ? "Unggah CSV di atas atau centang jejak tersimpan terlebih dahulu."
+                : "Isi pajak sebelumnya, dan pastikan kurs serta pajak saat ini sudah benar."}
+            </p>
+          </div>
+        )}
+      </section>
 
       <section className="history" id="jejak">
         <h2>Jejak tersimpan</h2>

@@ -45,3 +45,5 @@ di `public/fonts/` dan ganti `url()` di `globals.css`. Jika punya Mortane versi 
 - Desktop: dua kolom (unggah dan pengaturan di kiri, hasil di kanan). Mobile: satu kolom, tabel menjadi kartu.
 - Mode terang dan gelap mengikuti pengaturan perangkat.
 - Kurs dan pajak menerima koma atau titik sebagai desimal (`17494,13946` atau `17494.13946`).
+- **Koreksi pajak**: isi pajak sebelumnya, lalu hasilnya (pajak sebelumnya - pajak saat ini) tampil per kode 001-005 sebagai
+  gaji yang belum diterima. Bisa dari data yang sedang dimuat atau menggabungkan beberapa jejak tersimpan.

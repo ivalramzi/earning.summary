@@ -205,3 +205,19 @@ tfoot td{font-weight:500;font-size:17px;background:var(--lav);color:#17171a;bord
   .saved-body .scroll tbody tr{box-shadow:none}
 }
 @media (prefers-color-scheme:dark) and (max-width:720px){.scroll tfoot td::before{color:var(--ink)}}
+
+/* Koreksi pajak */
+.correction{margin-top:var(--s6);display:flex;flex-direction:column;gap:var(--s3)}
+.corr-setup{display:grid;gap:var(--s4);background:var(--card);border-radius:24px;padding:var(--s4);box-shadow:var(--shadow)}
+@media (min-width:900px){.corr-setup{grid-template-columns:320px minmax(0,1fr)}}
+.corr-inputs{display:flex;flex-direction:column;gap:var(--s2)}
+.corr-inputs label{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:500;color:var(--muted)}
+.corr-setup .hint{margin:0}
+.picker{border:0;padding:0;margin:0;min-width:0;display:flex;flex-direction:column;gap:var(--s2)}
+.picker legend{font-size:14px;font-weight:500;color:var(--muted);padding:0;margin-bottom:var(--s1)}
+.checks{display:flex;flex-wrap:wrap;gap:var(--s1)}
+.check{display:inline-flex;align-items:center;gap:var(--s1);min-height:44px;padding:0 var(--s3);border-radius:999px;background:var(--field);cursor:pointer;font-size:15px}
+.check input{width:18px;height:18px;accent-color:var(--ink)}
+.check:has(input:checked){background:var(--lav)}
+.hero-note{margin:var(--s3) 0 0;font-size:14px;font-weight:500}
+@media (max-width:720px){.corr-setup{padding:var(--s3)}}
